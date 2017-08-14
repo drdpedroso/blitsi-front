@@ -43,6 +43,13 @@ import './global-styles';
 
 // Import root routes
 import createRoutes from './routes';
+import { ApolloClient, createNetworkInterface, ApolloProvider } from 'react-apollo';
+
+const client = new ApolloClient({
+  networkInterface: createNetworkInterface({
+    uri: 'https://graphql.example.com',
+  }),
+});
 
 // Create redux store with history
 // this uses the singleton browserHistory provided by react-router
@@ -66,19 +73,21 @@ const rootRoute = {
 
 const render = (messages) => {
   ReactDOM.render(
-    <Provider store={store}>
-      <LanguageProvider messages={messages}>
-        <Router
-          history={history}
-          routes={rootRoute}
-          render={
-            // Scroll to top when going to a new page, imitating default browser
-            // behaviour
-            applyRouterMiddleware(useScroll())
-          }
-        />
-      </LanguageProvider>
-    </Provider>,
+    <ApolloProvider client={client}>
+      <Provider store={store}>
+        <LanguageProvider messages={messages}>
+          <Router
+            history={history}
+            routes={rootRoute}
+            render={
+              // Scroll to top when going to a new page, imitating default browser
+              // behaviour
+              applyRouterMiddleware(useScroll())
+            }
+          />
+        </LanguageProvider>
+      </Provider>
+    </ApolloProvider>,
     document.getElementById('app')
   );
 };
